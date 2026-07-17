@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta property="og:title" content="Web From Above">
+<meta property="og:description" content="Your PFA everywhere.">
+<meta property="og:image" content="https://kommodo.ai/i/whGc5yhyPUeaB1IFfu2r">
+<meta property="og:url" content="https://webfromabove.github.io">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web From Above</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="overlay" id="settingsOverlay"></div>
+
+   <div id="statusOverlay" style="position:fixed;top:0;right:0;background:rgba(0,0,0,0.5);color:#fff;font:11px 'Consolas', monospace;padding:3px 6px;z-index:490;pointer-events:none;border-bottom-left-radius:3px;min-width:140px;"></div>
+   <div id="messageOverlay" style="position:fixed;left:50%;top:28%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.55);color:#fff;font:13px 'Segoe UI',sans-serif;padding:10px 16px;text-align:center;z-index:490;pointer-events:none;max-width:55%;border-radius:4px;display:none;white-space:pre-line;"></div>
+   <div id="top10Overlay" style="position:fixed;left:50%;top:18%;transform:translate(-50%,0);background:rgba(0,0,0,0.6);color:#fff;font:11px 'Consolas',monospace;padding:6px 10px;z-index:490;pointer-events:none;display:none;min-width:280px;border-radius:4px;"></div>
+
+  <div id="loadingScreen" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:10000;flex-direction:column;align-items:center;justify-content:center;color:#FF6B6B;font-family:'Segoe UI',sans-serif;">
+     <div style="font-size:48px;margin-bottom:20px;">⏳</div>
+     <div style="font-size:24px;font-weight:600;">Loading...</div>
+     <div id="loadingText" style="font-size:14px;color:#aaa;margin-top:10px;"></div>
+  </div>
+
+  <div id="errorPopup" class="error-popup">
+      <span id="errorPopupText"></span>
+  </div>
+
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-header">
+        <div class="header-left">
+            <span>⚙</span>
+            <h2 id="settingsTitle">Settings</h2>
+            <button id="langBtn" class="lang-btn" title="Change language">EN</button>
+        </div>
+        <button class="settings-close" id="settingsClose">✕</button>
+    </div>
+    <div id="langDropdown" class="lang-dropdown"></div>
+
+    <div class="settings-tabs">
+        <button class="settings-tab active" data-tab="general">General</button>
+        <button class="settings-tab" data-tab="overlay">Overlay</button>
+        <button class="settings-tab" data-tab="visual">Visual</button>
+        <button class="settings-tab" data-tab="keyboard">Keyboard</button>
+        <button class="settings-tab" data-tab="gui">GUI</button>
+    </div>
+
+    <!-- General Tab -->
+    <div class="settings-tab-content active" id="tab-general">
+        <div class="section">
+            <div class="section-header">🔊 Master Volume <span class="setting-value" id="volumeValue">100%</span></div>
+            <div class="section-body">
+                <div class="slider-container">
+                    <input type="range" id="volumeSlider" min="0" max="100" step="1" value="100">
+                    <span class="slider-value" id="volumeDisplay">100</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header"><span class="status-indicator" id="midiStatus"></span> MIDI Input Devices</div>
+            <div class="section-body">
+                <select id="midiDeviceSelect">
+                    <option value="">-- No MIDI Device --</option>
+                </select>
+                <div id="midiDeviceList"></div>
+                <button class="btn" id="refreshMidiBtn" style="margin-top: 6px;">Refresh Devices</button>
+                <div class="section-info" id="midiInfo">Click refresh to scan for MIDI devices.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">🔊 Load SoundFont</div>
+            <div class="section-body">
+                <button class="btn btn-full" id="insertSoundFontBtn">Insert SoundFont</button>
+                <input type="file" id="soundFontFileInput" accept=".sf2,.sf3" style="display: none;">
+                <div id="insertedSoundFontInfo" class="section-info">Using built-in SoundFont (load .sf2/.sf3 to override)</div>
+                <div class="section-info">Load a SoundFont (.sf2/.sf3) file for custom instrument sounds.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">🎵 MIDI File Player</div>
+            <div class="section-body">
+                <button class="btn btn-full" id="loadMidiBtn">Load MIDI File</button>
+                <input type="file" id="midiFileInput" accept=".mid,.midi,.smf,.MID,.MIDI,.SMF" style="display: none;">
+                <div id="midiPlayerInfo" class="section-info">No file loaded</div>
+                <div class="midi-player-row">
+                    <button class="btn" id="midiPlayBtn">Play</button>
+                    <button class="btn" id="midiPauseBtn">Pause</button>
+                    <button class="btn" id="midiStopBtn">Stop</button>
+                </div>
+                <div class="midi-progress-container">
+                    <div class="midi-progress-row">
+                        <span id="midiCurrentTime">0:00</span>
+                        <span id="midiDuration">0:00</span>
+                    </div>
+                    <input type="range" id="midiProgressBar" min="0" max="100" value="0">
+                </div>
+                <div class="section-info" style="margin-top:6px;">Supports standard MIDI/SMF files (.mid, .midi, .smf).</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">🔊 Audio Buffer Size 8</div>
+            <div class="section-body">
+                <select id="audioBufferSizeSelect">
+                    <option value="256">256</option>
+                    <option value="512">512</option>
+                    <option value="1024" selected>1024</option>
+                    <option value="2048">2048</option>
+                    <option value="4096">4096</option>
+                </select>
+                <div class="section-info">Audio buffer size in samples (8-4096). Lower = less latency, higher = more stable.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay Tab -->
+    <div class="settings-tab-content" id="tab-overlay">
+        <div class="section">
+            <div class="section-header">📺 Overlay Settings</div>
+            <div class="section-body">
+                <label class="setting-label">
+                    <span>Show Status Overlay</span>
+                </label>
+                <label class="setting-label" style="margin-top:4px;">
+                    <span>Show Message Overlay</span>
+                </label>
+                <div class="section-info">Configure which overlays appear during playback.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visual Tab -->
+    <div class="settings-tab-content" id="tab-visual">
+        <div class="section">
+            <div class="section-header">🎨 Background Color</div>
+            <div class="section-body">
+                <div style="display:flex;gap:4px;align-items:center;">
+                    <input type="color" id="bgColorPicker" value="#464646" style="width:32px;height:20px;">
+                    <input type="text" id="bgColorText" value="#464646" style="flex:1;padding:3px 4px;background:#1a1a1a;border:1px solid #444;color:#ccc;font-family:monospace;font-size:10px;" maxlength="7">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">☀ Background Brightness <span class="setting-value" id="brightnessValue">50%</span></div>
+            <div class="section-body">
+                <div class="slider-container">
+                    <input type="range" id="brightnessSlider" min="0" max="100" step="5" value="50">
+                    <span class="slider-value" id="brightnessDisplay">50</span>
+                </div>
+                <div class="section-info">Adjust brightness while keeping the color hue.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">⏩ Note Speed <span class="setting-value" id="noteSpeedValue">3.0x</span></div>
+            <div class="section-body">
+                <div class="slider-container">
+                    <input type="range" id="noteSpeedSlider" min="100" max="20000" step="100" value="5000">
+                    <span class="slider-value" id="noteSpeedDisplay">3.0</span>
+                </div>
+                <div class="section-info">Controls how fast notes fall down the screen.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">📐 Display Options</div>
+            <div class="section-body">
+                <label class="setting-label">
+                    <input type="checkbox" id="gridToggle" checked> Show Grid Lines
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard Tab -->
+    <div class="settings-tab-content" id="tab-keyboard">
+        <div class="section">
+            <div class="section-header">🎹 Keyboard Settings</div>
+            <div class="section-body">
+                <div class="section-info">Keyboard display options coming soon.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GUI Tab -->
+    <div class="settings-tab-content" id="tab-gui">
+        <div class="section">
+            <div class="section-header">🔊 Audio Limiter</div>
+            <div class="section-body">
+                <label class="setting-label">
+                    <input type="checkbox" id="audioLimiterToggle" checked> Enable Audio Limiter
+                </label>
+                <div class="section-info">Prevents distortion on dense Black MIDI.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">ℹ Information</div>
+            <div class="section-body">
+                <div class="section-info">
+                    <strong>Web From Above</strong><br>
+                    Piano From Above | Website Version<br>
+                    A visual piano playing experience
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-footer">
+        <button class="btn" id="resetSettingsBtn">Reset to Defaults</button>
+        <button class="btn" id="exportSettingsBtn">Export</button>
+        <button class="btn" id="importSettingsBtn">Import</button>
+        <input type="file" id="settingsFileInput" accept=".json" style="display: none;">
+    </div>
+</div>
+
+<canvas id="c"></canvas>
+
+<script src="js/sf2-parser.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; background: #0a0a0a; overflow: hidden; }
+html { position: fixed; }
+canvas { display: block; position: absolute; top: 0; left: 0; }
+
+/* ===== Settings Panel (floating) ===== */
+.settings-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.96);
+    width: 680px;
+    max-width: 94vw;
+    max-height: 88vh;
+    background: #000;
+    border: 1px solid #444;
+    z-index: 1001;
+    overflow-y: auto;
+    font-family: 'Consolas','Courier New',monospace;
+    font-size: 11px;
+    color: #ccc;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+}
+.settings-panel.active { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+
+/* ===== Title Bar ===== */
+.settings-header {
+    padding: 6px 10px;
+    background: #111;
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+}
+.settings-header .header-left { display: flex; align-items: center; gap: 6px; }
+.settings-header h2 { color: #eee; font-size: 13px; font-weight: 700; margin: 0; letter-spacing: 0.3px; }
+.settings-close {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 2px;
+    line-height: 1;
+}
+.settings-close:hover { color: #fff; }
+.lang-btn {
+    background: #222;
+    border: 1px solid #555;
+    color: #aaa;
+    font: 10px/1 monospace;
+    padding: 2px 5px;
+    cursor: pointer;
+    min-width: 24px;
+    text-align: center;
+    border-radius: 3px;
+}
+.lang-btn:hover { background: #333; color: #fff; }
+
+/* ===== Language Dropdown ===== */
+.lang-dropdown {
+    position: absolute;
+    top: 32px;
+    left: 50px;
+    background: #111;
+    border: 1px solid #555;
+    z-index: 1002;
+    font: 10px monospace;
+    min-width: 150px;
+    max-height: 240px;
+    overflow-y: auto;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-4px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+}
+.lang-dropdown.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.lang-dropdown button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    color: #ccc;
+    padding: 4px 8px;
+    font: 10px monospace;
+    cursor: pointer;
+}
+.lang-dropdown button:hover { background: #222; color: #fff; }
+.lang-dropdown button.active { background: #2a2a2a; color: #0f0; }
+
+/* ===== Tabs ===== */
+.settings-tabs {
+    display: flex;
+    gap: 0;
+    padding: 6px 10px 0;
+    border-bottom: 1px solid #333;
+}
+.settings-tab {
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-bottom: none;
+    color: #aaa;
+    font: 11px monospace;
+    padding: 5px 14px;
+    cursor: pointer;
+    border-radius: 3px 3px 0 0;
+    margin-right: 2px;
+    transition: background 0.15s, color 0.15s;
+}
+.settings-tab:hover { background: #222; color: #ddd; }
+.settings-tab.active { background: #000; color: #fff; border-color: #666; }
+
+/* ===== Tab Content ===== */
+.settings-tab-content { display: none; padding: 8px 10px; }
+.settings-tab-content.active { display: block; }
+
+/* ===== Sections ===== */
+.section {
+    border: 1px solid #333;
+    margin-bottom: 8px;
+    background: #000;
+}
+.section-header {
+    padding: 4px 8px;
+    background: #111;
+    border-bottom: 1px solid #333;
+    font-weight: 700;
+    font-size: 11px;
+    color: #ddd;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.section-body { padding: 6px 8px; }
+.section-info { color: #777; font-size: 10px; margin-top: 3px; }
+
+/* ===== Form Controls ===== */
+.setting-label {
+    color: #bbb;
+    font-size: 10px;
+    margin-bottom: 3px;
+    display: block;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.setting-value { color: #aaa; font-size: 10px; margin-left: auto; }
+.slider-container { display: flex; align-items: center; gap: 6px; }
+.slider-container input[type="range"] {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: #333;
+    border-radius: 3px;
+    outline: none;
+}
+.slider-container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #4af;
+    cursor: pointer;
+    border: none;
+}
+.slider-container input[type="range"]::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #4af;
+    cursor: pointer;
+    border: none;
+}
+.slider-value { min-width: 28px; text-align: right; color: #aaa; font-size: 10px; }
+select, input[type="text"], input[type="color"] {
+    background: #1a1a1a;
+    border: 1px solid #444;
+    color: #ccc;
+    font-family: monospace;
+    font-size: 10px;
+    padding: 3px 4px;
+    border-radius: 2px;
+}
+select { width: 100%; }
+input[type="color"] { width: 32px; height: 20px; padding: 0; cursor: pointer; border: 1px solid #555; }
+.btn {
+    padding: 4px 10px;
+    border: 1px solid #555;
+    background: #1a1a1a;
+    color: #ccc;
+    cursor: pointer;
+    font: 10px monospace;
+    border-radius: 2px;
+    transition: background 0.12s;
+}
+.btn:hover { background: #333; color: #fff; }
+.btn.primary { background: #222; border-color: #666; }
+.btn-row { display: flex; gap: 6px; margin-top: 6px; }
+.btn-full { width: 100%; }
+
+/* ===== Status ===== */
+.status-indicator {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    background: #4c4;
+    margin-right: 4px;
+    vertical-align: middle;
+    border-radius: 50%;
+}
+.status-indicator.inactive { background: #c44; }
+
+/* ===== MIDI Player ===== */
+.midi-player-row { display: flex; gap: 6px; margin: 6px 0; }
+.midi-player-row .btn { flex: 1; }
+.midi-progress-container { background: #111; border: 1px solid #333; padding: 4px 6px; border-radius: 2px; }
+.midi-progress-row { display: flex; justify-content: space-between; font-size: 10px; color: #888; margin-bottom: 3px; }
+.midi-progress-container input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: #333;
+    border-radius: 3px;
+    outline: none;
+}
+.midi-progress-container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #4af;
+    cursor: pointer;
+    border: none;
+}
+.midi-progress-container input[type="range"]::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #4af;
+    cursor: pointer;
+    border: none;
+}
+
+/* ===== MIDI Device Item ===== */
+.midi-device-item {
+    background: #111;
+    padding: 3px 6px;
+    margin-bottom: 2px;
+    border-left: 2px solid #555;
+    font-size: 10px;
+}
+.midi-device-item.selected { background: #1a1a1a; border-left-color: #aaa; }
+
+/* ===== Overlay ===== */
+.overlay {
+    opacity: 0;
+    pointer-events: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.55);
+    z-index: 1000;
+    transition: opacity 0.25s ease;
+}
+.overlay.active { opacity: 1; pointer-events: auto; }
+
+/* ===== Error Popup ===== */
+.error-popup {
+    display: none;
+    position: fixed;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10060;
+    background: #2a1515;
+    border: 1px solid #c44;
+    color: #f88;
+    font: 11px monospace;
+    padding: 5px 14px;
+    border-radius: 3px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    max-width: 92%;
+    text-align: center;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.35s ease;
+    cursor: pointer;
+}
+
+/* ===== Bottom Actions ===== */
+.settings-footer {
+    padding: 6px 10px 8px;
+    border-top: 1px solid #333;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.settings-footer .btn { font-size: 10px; }
+
+/* ===== Scrollbar ===== */
+.settings-panel::-webkit-scrollbar { width: 6px; }
+.settings-panel::-webkit-scrollbar-track { background: #111; }
+.settings-panel::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+.settings-panel::-webkit-scrollbar-thumb:hover { background: #555; }
