@@ -248,6 +248,17 @@ function setupSettingsUI() {
             reader.readAsText(file);
         }
     });
+
+    const settingsTabs = document.querySelectorAll('.settings-tab');
+    settingsTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            settingsTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            document.querySelectorAll('.settings-tab-content').forEach(c => c.classList.remove('active'));
+            const target = document.getElementById('tab-' + tab.dataset.tab);
+            if (target) target.classList.add('active');
+        });
+    });
 }
 
 function updateMIDIPlayerUI() {
