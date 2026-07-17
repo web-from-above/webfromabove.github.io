@@ -117,7 +117,7 @@ canvas { display: block; position: absolute; top: 0; left: 0; }
 .settings-tab.active { background: #000; color: #fff; border-color: #666; }
 
 /* ===== Tab Content ===== */
-.settings-tab-content { display: none; padding: 8px 10px; }
+.settings-tab-content { display: none; padding: 8px 10px; height: 360px; overflow-y: auto; }
 .settings-tab-content.active { display: block; }
 
 /* ===== Sections ===== */
@@ -310,3 +310,25 @@ input[type="color"] { width: 32px; height: 20px; padding: 0; cursor: pointer; bo
 .settings-panel::-webkit-scrollbar-track { background: #111; }
 .settings-panel::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
 .settings-panel::-webkit-scrollbar-thumb:hover { background: #555; }
+
+/* ===== Settings Toggle Button ===== */
+.settings-toggle-btn {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 999;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid #555;
+    color: #ccc;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    transition: background 0.12s, color 0.12s;
+    line-height: 1;
+}
+.settings-toggle-btn:hover { background: #222; color: #fff; }

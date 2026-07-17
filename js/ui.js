@@ -11,23 +11,21 @@ function setupSettingsUI() {
     const close   = document.getElementById('settingsClose');
     const panel   = document.getElementById('settingsPanel');
     const overlay = document.getElementById('settingsOverlay');
-    if(!close || !panel || !overlay) { 
+    if(!toggle || !close || !panel || !overlay) { 
         console.warn('Settings UI elements not found'); 
         return; 
     }
 
-    if (toggle) {
-        toggle.addEventListener('click', () => {
-            const wasOpen = panel.classList.contains('active');
-            panel.classList.toggle('active');
-            overlay.classList.toggle('active');
-            if (!wasOpen) {
-                if (typeof sfxManager !== 'undefined') sfxManager.playUIOpen();
-            } else {
-                if (typeof sfxManager !== 'undefined') sfxManager.playUIClose();
-            }
-        });
-    }
+    toggle.addEventListener('click', () => {
+        const wasOpen = panel.classList.contains('active');
+        panel.classList.toggle('active');
+        overlay.classList.toggle('active');
+        if (!wasOpen) {
+            if (typeof sfxManager !== 'undefined') sfxManager.playUIOpen();
+        } else {
+            if (typeof sfxManager !== 'undefined') sfxManager.playUIClose();
+        }
+    });
 
     if (close) {
         close.addEventListener('click', () => {
